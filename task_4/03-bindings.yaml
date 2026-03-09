@@ -1,0 +1,187 @@
+# =============================================================
+# Привязка 1: группа data → cluster-viewer
+# Все пользователи с O=data в сертификате получают
+# read-only доступ ко всему кластеру
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: data-group-viewer-binding
+subjects:
+  - kind: Group
+    name: data
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-viewer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 2: группа devops → cluster-operator
+# DevOps-инженеры получают права на управление ресурсами
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: devops-group-operator-binding
+subjects:
+  - kind: Group
+    name: devops
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-operator
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 3: группа security → secrets-reader (namespace: prod)
+# Офицеры безопасности получают доступ к секретам
+# только в namespace prod
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: security-group-secrets-binding
+  namespace: prod
+subjects:
+  - kind: Group
+    name: security
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 4: группа security → cluster-viewer
+# Офицеры безопасности также получают read-only доступ
+# ко всему кластеру для проведения аудита
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-group-viewer-binding
+subjects:
+  - kind: Group
+    name: security
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-viewer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 5: группа crm-dev → crm-namespace-developer (namespace: crm)
+# Разработчики CRM получают права на управление ресурсами
+# только в namespace crm
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crm-dev-group-binding
+  namespace: crm
+subjects:
+  - kind: Group
+    name: crm-dev
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: crm-namespace-developer
+  apiGroup: rbac.authorization.k8s.io# =============================================================
+# Привязка 1: группа data → cluster-viewer
+# Все пользователи с O=data в сертификате получают
+# read-only доступ ко всему кластеру
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: data-group-viewer-binding
+subjects:
+  - kind: Group
+    name: data
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-viewer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 2: группа devops → cluster-operator
+# DevOps-инженеры получают права на управление ресурсами
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: devops-group-operator-binding
+subjects:
+  - kind: Group
+    name: devops
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-operator
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 3: группа security → secrets-reader (namespace: prod)
+# Офицеры безопасности получают доступ к секретам
+# только в namespace prod
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: security-group-secrets-binding
+  namespace: prod
+subjects:
+  - kind: Group
+    name: security
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 4: группа security → cluster-viewer
+# Офицеры безопасности также получают read-only доступ
+# ко всему кластеру для проведения аудита
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-group-viewer-binding
+subjects:
+  - kind: Group
+    name: security
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-viewer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# =============================================================
+# Привязка 5: группа crm-dev → crm-namespace-developer (namespace: crm)
+# Разработчики CRM получают права на управление ресурсами
+# только в namespace crm
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crm-dev-group-binding
+  namespace: crm
+subjects:
+  - kind: Group
+    name: crm-dev
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: crm-namespace-developer
+  apiGroup: rbac.authorization.k8s.io
