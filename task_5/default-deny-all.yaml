@@ -1,0 +1,12 @@
+# Запрет всего входящего и исходящего трафика по умолчанию.
+# Это базовая политика — весь трафик закрыт, далее точечно
+# открываем только разрешённые пары.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

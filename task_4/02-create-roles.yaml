@@ -1,0 +1,95 @@
+# =============================================================
+# Роль 1: cluster-viewer
+# Назначение: только просмотр ресурсов кластера
+# Группы: аналитики, аудиторы
+# Обоснование: выявлена необходимость разграничения доступа по принципу
+# минимальных привилегий. Аналитикам достаточно
+# read-only доступа для мониторинга состояния сервисов.
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-viewer
+rules:
+  - apiGroups: ["", "apps", "networking.k8s.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+
+---
+# =============================================================
+# Роль 2: cluster-operator
+# Назначение: управление ресурсами кластера (деплой, настройка)
+# Группы: DevOps-инженеры
+# Обоснование: DevOps-команда отвечает за развёртывание
+# бизнес-сервисов. Им необходим полный CRUD на рабочие ресурсы, но без
+# доступа к секретам и RBAC.
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-operator
+rules:
+  - apiGroups: ["", "apps"]
+    resources:
+      - pods
+      - services
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+      - configmaps
+      - persistentvolumeclaims
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["events", "namespaces"]
+    verbs: ["get", "list", "watch"]
+
+---
+# =============================================================
+# Роль 3: secrets-reader (namespace-уровневая)
+# Назначение: просмотр секретов только в namespace prod
+# Группы: офицеры безопасности
+# Обоснование: выявлена необходимость контролируемого доступа к секретам.
+# В namespace prod развёрнуты сервисы, работающие с ПДн.
+# Доступ ограничен конкретным namespace по принципу
+# минимальных привилегий.
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secrets-reader
+  namespace: prod
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+
+---
+# =============================================================
+# Роль 4: crm-namespace-developer (namespace-уровневая)
+# Назначение: управление ресурсами в namespace crm
+# Группы: разработчики CRM-подразделения
+# Обоснование: организационная структура предполагает разделение по продуктовым командам.
+# Разработчики CRM не должны иметь доступ к ресурсам
+# ЖКУ или аналитики.
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: crm-namespace-developer
+  namespace: crm
+rules:
+  - apiGroups: ["", "apps"]
+    resources:
+      - pods
+      - services
+      - deployments
+      - replicasets
+      - configmaps
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log", "pods/exec"]
+    verbs: ["get", "list"]
